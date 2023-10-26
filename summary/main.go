@@ -38,7 +38,7 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 
 		// don't look for mesages in lines that  list service checks
 		// ..msg="- acm"..
-		if strings.HasPrefix(line, "- ") {
+		if strings.Contains(line, "msg=\"- ") {
 			contents.StatusLines = append(contents.StatusLines, line)
 			continue
 		}
