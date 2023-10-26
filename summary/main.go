@@ -31,6 +31,9 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 		if strings.Contains(line, "msg=") {
 
 			msg, err := ExtractStringBetweenTwoSubstrings(line, "msg=\"", "\"")
+			if strings.Contains(msg, "enabled region") {
+				continue
+			}
 			if err != nil {
 				panic(errors.New(fmt.Sprintf("malformed message line: %v", msg)))
 			}
