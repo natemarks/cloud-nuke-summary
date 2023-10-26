@@ -30,3 +30,38 @@ func TestGetContentsFromFile(t *testing.T) {
 		})
 	}
 }
+
+func TestExtractStringBetweenTwoSubstrings(t *testing.T) {
+	type args struct {
+		input string
+		start string
+		end   string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult string
+		wantFound  bool
+	}{
+		{
+			name: "sdf",
+			args: args{
+				input: "fghrhryjytjyjaaahyhyhyhybbbjyutkukuki",
+				start: "aaa",
+				end:   "bbb"},
+			wantResult: "hyhyhyhy",
+			wantFound:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, gotFound := ExtractStringBetweenTwoSubstrings(tt.args.input, tt.args.start, tt.args.end)
+			if gotResult != tt.wantResult {
+				t.Errorf("ExtractStringBetweenTwoSubstrings() gotResult = %v, want %v", gotResult, tt.wantResult)
+			}
+			if gotFound != tt.wantFound {
+				t.Errorf("ExtractStringBetweenTwoSubstrings() gotFound = %v, want %v", gotFound, tt.wantFound)
+			}
+		})
+	}
+}

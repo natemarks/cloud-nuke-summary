@@ -21,11 +21,28 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 	contents.AllLines, err = file.ReadFileLines(filepath)
 	for _, line := range contents.AllLines {
 		if strings.Contains(line, "msg=") {
-			contents.MessageLines = append(contents.MessageLines, line)
+			msg, _ := ExtractStringBetweenTwoSubstrings(line, "msg=\"", "\"")
+			contents.MessageLines = append(contents.MessageLines, msg)
 		} else {
 			contents.StatusLines = append(contents.StatusLines, line)
 		}
 
 	}
 	return contents, err
+}
+
+// ExtractStringBetweenTwoSubstrings returns a string between two substrings
+func ExtractStringBetweenTwoSubstrings(input, start, end string) (result string, found bool) {
+	startIndex := strings.Index(input, start)
+	if startIndex == -1 {
+		return "", false // Beginning substring not found
+	}
+
+	endIndex := strings.Index(input[startIndex+len(start):], end)
+	if endIndex == -1 {
+		return "", false // Ending substring not found
+	}
+
+	extracted := input[startIndex+len(start) : startIndex+len(start)+endIndex]
+	return extracted, true
 }
