@@ -70,3 +70,12 @@ func GetMessage(input string) (message Message, err error) {
 		Region:       strings.TrimSuffix(words[2], "\\n"),
 	}, err
 }
+
+// PrintReport prints a report of the file contents
+func PrintReport(fileContents FileContents) {
+
+	for _, messageLine := range fileContents.MessageLines {
+		msg, _ := GetMessage(messageLine)
+		fmt.Printf("%v : %v : %v", msg.Service, msg.ResourceName, msg.Region)
+	}
+}
