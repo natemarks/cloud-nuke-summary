@@ -28,10 +28,21 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 	contents.Sha256sum, err = file.CalculateSHA256Sum(filepath)
 	contents.AllLines, err = file.ReadFileLines(filepath)
 	for _, line := range contents.AllLines {
+		// don't look for messages in lines that talk about enabled rregiong
+		// ..level=info msg="Identifying enabled regions"..
+		// ..msg="Found enabled region ap-south-1"..
 		if strings.Contains(line, "enabled region") {
 			contents.StatusLines = append(contents.StatusLines, line)
 			continue
 		}
+
+		// don't look for mesages in lines that  list service checks
+		// ..msg="- acm"..
+		if strings.HasPrefix(line, "- ") {
+			contents.StatusLines = append(contents.StatusLines, line)
+			continue
+		}
+
 		if strings.Contains(line, "msg=") {
 
 			msg, err := ExtractStringBetweenTwoSubstrings(line, "msg=\"", "\"")
