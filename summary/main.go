@@ -91,6 +91,6 @@ func PrintReport(fileContents FileContents) {
 
 	for _, messageLine := range fileContents.MessageLines {
 		msg, _ := GetMessage(messageLine)
-		fmt.Printf("%v : %v : %v", msg.Service, msg.ResourceName, msg.Region)
+		fmt.Println(msg.Service+" : ", msg.ResourceName+" : ", msg.Region)
 	}
 }
