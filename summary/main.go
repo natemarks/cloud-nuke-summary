@@ -28,6 +28,10 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 	contents.Sha256sum, err = file.CalculateSHA256Sum(filepath)
 	contents.AllLines, err = file.ReadFileLines(filepath)
 	for _, line := range contents.AllLines {
+		if strings.Contains(line, "enabled region") {
+			contents.StatusLines = append(contents.StatusLines, line)
+			continue
+		}
 		if strings.Contains(line, "msg=") {
 
 			msg, err := ExtractStringBetweenTwoSubstrings(line, "msg=\"", "\"")
