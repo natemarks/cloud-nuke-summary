@@ -1,6 +1,7 @@
 package summary
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/natemarks/cloud-nuke-summary/projectpath"
@@ -41,26 +42,62 @@ func TestExtractStringBetweenTwoSubstrings(t *testing.T) {
 		name       string
 		args       args
 		wantResult string
-		wantFound  bool
+		wantErr    bool
+	}{{
+		name: "sdf",
+		args: args{
+			input: "fghrhryjytjyjaaahyhyhyhybbbjyutkukuki",
+			start: "aaa",
+			end:   "bbb"},
+		wantResult: "hyhyhyhy",
+		wantErr:    false,
+	},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, err := ExtractStringBetweenTwoSubstrings(tt.args.input, tt.args.start, tt.args.end)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractStringBetweenTwoSubstrings() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotResult != tt.wantResult {
+				t.Errorf("ExtractStringBetweenTwoSubstrings() gotResult = %v, want %v", gotResult, tt.wantResult)
+			}
+		})
+	}
+}
+
+func TestGetMessage(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantMessage Message
+		wantErr     bool
 	}{
 		{
 			name: "sdf",
 			args: args{
-				input: "fghrhryjytjyjaaahyhyhyhybbbjyutkukuki",
-				start: "aaa",
-				end:   "bbb"},
-			wantResult: "hyhyhyhy",
-			wantFound:  true,
-		},
+				input: "\\x1b[1;mcloudwatch-dashboard\\x1b[0m EcsLoadTesting-CsP9WPSdg2-us-east-2 us-west-2\\n",
+			},
+			wantMessage: Message{
+				Service:      "mcloudwatch-dashboard",
+				ResourceName: "EcsLoadTesting-CsP9WPSdg2-us-east-2",
+				Region:       "us-west-2",
+			},
+			wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotResult, gotFound := ExtractStringBetweenTwoSubstrings(tt.args.input, tt.args.start, tt.args.end)
-			if gotResult != tt.wantResult {
-				t.Errorf("ExtractStringBetweenTwoSubstrings() gotResult = %v, want %v", gotResult, tt.wantResult)
+			gotMessage, err := GetMessage(tt.args.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetMessage() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if gotFound != tt.wantFound {
-				t.Errorf("ExtractStringBetweenTwoSubstrings() gotFound = %v, want %v", gotFound, tt.wantFound)
+			if !reflect.DeepEqual(gotMessage, tt.wantMessage) {
+				t.Errorf("GetMessage() gotMessage = %v, want %v", gotMessage, tt.wantMessage)
 			}
 		})
 	}
