@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/natemarks/cloud-nuke-summary/file"
+	"github.com/natemarks/cloud-nuke-summary/version"
 )
 
 type FileContents struct {
@@ -89,6 +90,16 @@ func GetMessage(input string) (message Message, err error) {
 	}, err
 }
 
+func PrintVersion(fileContents FileContents) {
+	fmt.Println("cloud-nuke-summary git commit: " + version.Version)
+	fmt.Println("cloud-nuke output file: " + fileContents.Filepath)
+	fmt.Println("cloud-nuke output file sha256sum: " + fileContents.Sha256sum)
+	fmt.Println(fmt.Sprintf("cloud-nuke output total lines: %v", len(fileContents.AllLines)))
+	fmt.Println(fmt.Sprintf("cloud-nuke output status lines: %v", len(fileContents.StatusLines)))
+	fmt.Println(fmt.Sprintf("cloud-nuke output message lines: %v", len(fileContents.MessageLines)))
+	fmt.Println()
+}
+
 func PrintResourcesCountByRegion(fileContents FileContents) {
 	result := make(map[string]int)
 	for _, messageLine := range fileContents.MessageLines {
@@ -104,6 +115,7 @@ func PrintResourcesCountByRegion(fileContents FileContents) {
 
 // PrintReport prints a report of the file contents
 func PrintReport(fileContents FileContents) {
+	PrintVersion(fileContents)
 	PrintResourcesCountByRegion(fileContents)
 	for _, messageLine := range fileContents.MessageLines {
 		msg, _ := GetMessage(messageLine)
