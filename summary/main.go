@@ -79,16 +79,32 @@ func GetMessage(input string) (message Message, err error) {
 	words := strings.Fields(input)
 	service := strings.TrimPrefix(words[0], "\\x1b[1;")
 	service = strings.TrimSuffix(service, "\\x1b[0m")
+
+	region := words[len(words)-1]
+
 	return Message{
 		Service:      service,
-		ResourceName: words[1],
-		Region:       strings.TrimSuffix(words[2], "\\n"),
+		ResourceName: words[len(words)-2], // slice with first and last words removed
+		Region:       strings.TrimSuffix(region, "\\n"),
 	}, err
+}
+
+func PrintResourcesCountByRegion(fileContents FileContents) {
+	result := make(map[string]int)
+	for _, messageLine := range fileContents.MessageLines {
+		msg, _ := GetMessage(messageLine)
+		result[msg.Region]++
+	}
+	for region, count := range result {
+		out := fmt.Sprintf("%v: %v", region, count)
+		fmt.Println(out)
+	}
+	fmt.Println()
 }
 
 // PrintReport prints a report of the file contents
 func PrintReport(fileContents FileContents) {
-
+	PrintResourcesCountByRegion(fileContents)
 	for _, messageLine := range fileContents.MessageLines {
 		msg, _ := GetMessage(messageLine)
 		fmt.Println(msg.Service+" : ", msg.ResourceName+" : ", msg.Region)
