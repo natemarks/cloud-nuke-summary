@@ -115,10 +115,11 @@ func PrintResourcesCountByRegion(fileContents FileContents) {
 
 // PrintReport prints a report of the file contents
 func PrintReport(fileContents FileContents) {
-	PrintVersion(fileContents)
-	PrintResourcesCountByRegion(fileContents)
 	for _, messageLine := range fileContents.MessageLines {
 		msg, _ := GetMessage(messageLine)
 		fmt.Println(msg.Service+" : ", msg.ResourceName+" : ", msg.Region)
 	}
+	fmt.Println()
+	PrintResourcesCountByRegion(fileContents)
+	PrintVersion(fileContents)
 }
