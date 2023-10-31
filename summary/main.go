@@ -10,17 +10,26 @@ import (
 )
 
 type FileContents struct {
-	Filepath     string   // path to the result file
-	Sha256sum    string   // sha256sum of the file
-	StatusLines  []string // First lines before the message lines
-	AllLines     []string // all lines and all content
-	MessageLines []string //message lines with only the  message content
+	Filepath     string    // path to the result file
+	Sha256sum    string    // sha256sum of the file
+	StatusLines  []string  // First lines before the message lines
+	AllLines     []string  // all lines and all content
+	MessageLines []string  //message lines with only the  message content
+	Messages     []Message // message lines parsed into a struct
 }
 
 type Message struct {
 	Service      string
 	ResourceName string
 	Region       string
+}
+
+func (fc FileContents) GetMessages() (messages []Message) {
+	for _, messageLine := range fc.MessageLines {
+		msg, _ := GetMessage(messageLine)
+		messages = append(messages, msg)
+	}
+	return messages
 }
 
 // GetContentsFromFile returns a FileContents struct with the contents of the file
@@ -56,6 +65,7 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 		}
 
 	}
+	contents.Messages = contents.GetMessages()
 	return contents, err
 }
 
@@ -101,6 +111,7 @@ func PrintVersion(fileContents FileContents) {
 }
 
 func PrintResourcesCountByRegion(fileContents FileContents) {
+	fmt.Println("Resources Count By Region")
 	result := make(map[string]int)
 	for _, messageLine := range fileContents.MessageLines {
 		msg, _ := GetMessage(messageLine)
@@ -108,6 +119,20 @@ func PrintResourcesCountByRegion(fileContents FileContents) {
 	}
 	for region, count := range result {
 		out := fmt.Sprintf("%v: %v", region, count)
+		fmt.Println(out)
+	}
+	fmt.Println()
+}
+
+func PrintResourceCountByType(contents FileContents) {
+	fmt.Println("Resources Count By Type")
+	result := make(map[string]int)
+
+	for _, message := range contents.Messages {
+		result[message.Service]++
+	}
+	for service, count := range result {
+		out := fmt.Sprintf("%v: %v", service, count)
 		fmt.Println(out)
 	}
 	fmt.Println()
@@ -121,5 +146,6 @@ func PrintReport(fileContents FileContents) {
 	}
 	fmt.Println()
 	PrintResourcesCountByRegion(fileContents)
+	PrintResourceCountByType(fileContents)
 	PrintVersion(fileContents)
 }
