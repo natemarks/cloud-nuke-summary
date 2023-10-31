@@ -9,6 +9,7 @@ import (
 	"github.com/natemarks/cloud-nuke-summary/version"
 )
 
+// FileContents is a struct that contains the contents of a file
 type FileContents struct {
 	Filepath     string    // path to the result file
 	Sha256sum    string    // sha256sum of the file
@@ -18,12 +19,14 @@ type FileContents struct {
 	Messages     []Message // message lines parsed into a struct
 }
 
+// Message is a struct that contains the service, resource name, and region
 type Message struct {
 	Service      string
 	ResourceName string
 	Region       string
 }
 
+// GetMessages returns a slice of Message structs
 func (fc FileContents) GetMessages() (messages []Message) {
 	for _, messageLine := range fc.MessageLines {
 		msg, _ := GetMessage(messageLine)
@@ -57,7 +60,7 @@ func GetContentsFromFile(filepath string) (contents FileContents, err error) {
 
 			msg, err := ExtractStringBetweenTwoSubstrings(line, "msg=\"", "\"")
 			if err != nil {
-				panic(errors.New(fmt.Sprintf("malformed message line: %v", msg)))
+				panic(fmt.Errorf("malformed message line: %v", msg))
 			}
 			contents.MessageLines = append(contents.MessageLines, msg)
 		} else {
@@ -100,6 +103,7 @@ func GetMessage(input string) (message Message, err error) {
 	}, err
 }
 
+// PrintVersion prints the version of the program
 func PrintVersion(fileContents FileContents) {
 	fmt.Println("cloud-nuke-summary git commit: " + version.Version)
 	fmt.Println("cloud-nuke output file: " + fileContents.Filepath)
@@ -110,6 +114,7 @@ func PrintVersion(fileContents FileContents) {
 	fmt.Println()
 }
 
+// PrintResourcesCountByRegion prints the count of resources by region
 func PrintResourcesCountByRegion(fileContents FileContents) {
 	fmt.Println("Resources Count By Region")
 	result := make(map[string]int)
@@ -124,6 +129,7 @@ func PrintResourcesCountByRegion(fileContents FileContents) {
 	fmt.Println()
 }
 
+// PrintResourceCountByType prints the count of resources by type
 func PrintResourceCountByType(contents FileContents) {
 	fmt.Println("Resources Count By Type")
 	result := make(map[string]int)

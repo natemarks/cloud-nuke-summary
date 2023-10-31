@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+// ReadFileLines returns a slice of strings, each string is a line from the file
 func ReadFileLines(filename string) ([]string, error) {
 	// Open the file for reading
 	file, err := os.Open(filename)
